@@ -5,15 +5,18 @@ Public Class Form1
 
     Private Sub ButtonGoOutput_Click(sender As Object, e As EventArgs) Handles ButtonGoOutput.Click
         Dim ExcelApp As New Excel.Application
-        '''''''ExcelApp.Visible = True
+        ' ExcelApp.Visible = True ' Uncomment to make Excel visible
         ToolStripStatusLabel1.Text = "Creating file " & TextBoxOutputFile.Text
         Dim OutputWorkbook As Excel.Workbook = ExcelApp.Workbooks.Add
         Dim OutputSheet As Excel.Worksheet = OutputWorkbook.ActiveSheet
 
         Try
+            ' Iterate over each file in the ListViewFilesOutput
             For Each ListItem As ListViewItem In ListViewFilesOutput.Items
                 Dim InputWorkbook As Excel.Workbook = ExcelApp.Workbooks.Open(ListItem.Text)
                 ToolStripStatusLabel1.Text = "Reading file " & InputWorkbook.Name
+                
+                ' Iterate over each worksheet in the input workbook
                 For Each InputSheet As Excel.Worksheet In InputWorkbook.Worksheets
                     Dim IDCol As Integer = InputSheet.Range(TextBoxIDRange.Text & ":" & TextBoxIDRange.Text).Column
                     Dim GradeCol As Integer = InputSheet.Range(TextBoxGradeRange.Text).Column
@@ -21,7 +24,7 @@ Public Class Form1
                     Dim CourseCol As Integer
                     Dim CourseName As String = InputSheet.Range(TextBoxCourseRange.Text).Value
 
-                    'Find or create Course column header
+                    ' Find or create Course column header
                     Dim CourseNameCell As Excel.Range = Nothing
                     CourseNameCell = OutputSheet.Range(OutputSheet.Cells(1, 2), OutputSheet.Cells(1, OutputSheet.UsedRange.Columns.Count)).Find(CourseName, , , Excel.XlLookAt.xlWhole)
                     If IsNothing(CourseNameCell) Then
@@ -31,7 +34,7 @@ Public Class Form1
                         CourseCol = CourseNameCell.Column
                     End If
 
-                    'Copy Grades to Course column, ID row
+                    ' Copy Grades to Course column, ID row
                     While Not IsNothing(InputSheet.Cells(GradeRow, IDCol).Value)
                         Dim ID As Integer = InputSheet.Cells(GradeRow, IDCol).Value
                         OutputSheet.Cells(ID, 1).Value = ID
@@ -43,6 +46,7 @@ Public Class Form1
                 Marshal.ReleaseComObject(InputWorkbook)
             Next
 
+            ' Save and close the output workbook
             ToolStripStatusLabel1.Text = "Saving Workbook"
             OutputWorkbook.SaveAs(TextBoxOutputFile.Text, Excel.XlFileFormat.xlAddIn8)
             ToolStripStatusLabel1.Text = "Closing Workbook"
@@ -51,10 +55,12 @@ Public Class Form1
             ExcelApp.Quit()
             ToolStripStatusLabel1.Text = "Done"
         Catch ex As Exception
+            ' Handle any errors that occur
             ToolStripStatusLabel1.Text = "Error: " & ex.Message
             MessageBox.Show(ex.Message)
             MessageBox.Show("Stack Trace: " & vbCrLf & ex.StackTrace)
         Finally
+            ' Release COM objects and perform garbage collection
             Marshal.ReleaseComObject(OutputSheet)
             Marshal.ReleaseComObject(OutputWorkbook)
             Marshal.ReleaseComObject(ExcelApp)
@@ -78,11 +84,12 @@ Public Class Form1
         Try
             ToolStripStatusLabel1.Text = "Opening Excel"
             ExcelApp = New Excel.Application
-            'ExcelApp.Visible = True
+            ' ExcelApp.Visible = True ' Uncomment to make Excel visible
             ToolStripStatusLabel1.Text = "Opening file " & TextBoxInputFile.Text
             InputWorkbook = ExcelApp.Workbooks.Open(TextBoxInputFile.Text)
             If TextBoxInputEK.Text <> "" Then EKWorkbook = ExcelApp.Workbooks.Open(TextBoxInputEK.Text)
 
+            ' Iterate over each worksheet in the input workbook
             For Each InputSheet In InputWorkbook.Worksheets
                 Dim newTeacher As String = InputSheet.Range(TextBoxTeachersRange.Text).Value
                 If IsNothing(newTeacher) Then
@@ -101,62 +108,64 @@ Public Class Form1
                 End If
                 ToolStripStatusLabel1.Text = InputSheet.Name & ": " & newTeacher
 
-                'Create folder
+                ' Create folder for the teacher if it doesn't exist
                 If CheckBoxCreateFolders.Checked And (Not Directory.Exists(BaseFolder & "\" & newTeacher)) Then
                     Directory.CreateDirectory(BaseFolder & "\" & newTeacher)
                 End If
 
+                ' Handle the per-teacher option
                 If RadioButtonPerTeacher.Checked Then
-                    'Populate Teachers collection with List of Strings
-                    '   First List item contains Teacher's Name
-                    '   Further List items contain Teacher's Sheets Names
+                    ' Populate Teachers collection with List of Strings
+                    ' First List item contains Teacher's Name
+                    ' Further List items contain Teacher's Sheets Names
                     If Not Teachers.Contains(newTeacher) Then
                         Teachers.Add(New List(Of String), newTeacher)
                         Teachers(newTeacher).Add(newTeacher)
                     End If
-                    Teachers(newTeacher).add(InputSheet.Name)
+                    Teachers(newTeacher).Add(InputSheet.Name)
                 End If
 
-                'Unlock Grades Cells
+                ' Unlock Grades Cells
                 Dim IDCol = InputSheet.Range(TextBoxIDRange.Text & ":" & TextBoxIDRange.Text).Column
                 Dim GradeCol As Integer = InputSheet.Range(TextBoxGradeRange.Text).Column
                 Dim GradeRow As Integer = InputSheet.Range(TextBoxGradeRange.Text).Row
                 While Not IsNothing(InputSheet.Cells(GradeRow, IDCol).Value)
                     ToolStripStatusLabel2.Text = "Unlocking cell " & GradeCol & "," & GradeRow
                     InputSheet.Cells(GradeRow, GradeCol).MergeArea.Locked = False
-                    'InputSheet.Cells(GradeRow, GradeCol + 2).MergeArea.Locked = False
+                    ' InputSheet.Cells(GradeRow, GradeCol + 2).MergeArea.Locked = False ' Uncomment if needed
                     GradeRow += 1
                 End While
 
-                'Password protect Sheet
+                ' Password protect the sheet
                 ToolStripStatusLabel2.Text = "Password protecting"
                 InputSheet.Protect(TextBoxPassword.Text)
                 ToolStripStatusLabel2.Text = ""
 
+                ' Handle the per-course option
                 If RadioButtonPerCourse.Checked Then
                     InputSheet.Copy()
 
-                    'Save file
+                    ' Save file
                     If Not CheckBoxCreateFolders.Checked Then newTeacher = "Βαθμολόγια για συμπλήρωση"
                     If Not Directory.Exists(BaseFolder & "\" & newTeacher) Then Directory.CreateDirectory(BaseFolder & "\" & newTeacher)
-                    OutputPath = BaseFolder & "\" & newTeacher & "\" & RemoveIllegalFileNameChars(InputSheet.Range(TextBoxTmimaRange.Text).Value & "-" & InputSheet.Range(TextBoxCourseRange.Text).Value & ".xlsx", "-")
+                    OutputPath = BaseFolder & "\" & newTeacher & "\" & RemoveIllegalFileNameChars(InputSheet.Range(TextBoxTmimaRange.Text).Value & "-" & InputSheet.Range(TextBoxCourseRange.Text).Value) & ".xlsx"
                     ToolStripStatusLabel1.Text = "Saving " & OutputPath
                     ExcelApp.ActiveWorkbook.SaveAs(OutputPath)
                     ExcelApp.ActiveWorkbook.Close()
                 End If
             Next
 
+            ' Handle the per-teacher option
             If RadioButtonPerTeacher.Checked Then
                 For i = 1 To Teachers.Count
-                    'Copy Teacher's Sheets to new Workbook
+                    ' Copy Teacher's Sheets to new Workbook
                     ToolStripStatusLabel1.Text = "Preparing output for " & Teachers(i)(0)
                     ToolStripStatusLabel2.Text = "Copying Sheets to new Workbook"
                     Dim SheetsToCopy(Teachers(i).Count - 2) As String
                     Array.Copy(Teachers(i).ToArray, 1, SheetsToCopy, 0, Teachers(i).Count - 1)
                     InputWorkbook.Worksheets(SheetsToCopy).Copy()
 
-                    'Populate Tmimata list
-                    'Rename Sheets to "Tmima - Course"
+                    ' Populate Tmimata list and rename sheets
                     ToolStripStatusLabel2.Text = "Naming Sheets"
                     Dim Tmimata As New List(Of String)
                     For Each InputSheet In ExcelApp.ActiveWorkbook.Worksheets
@@ -166,7 +175,7 @@ Public Class Form1
                     Next
                     ToolStripStatusLabel2.Text = ""
 
-                    'Save file
+                    ' Save file
                     OutputPath = BaseFolder & "\" & Teachers(i)(0) & "\" & Teachers(i)(0) & " " & String.Join(",", Tmimata.ToArray) & ".xlsx"
                     ToolStripStatusLabel1.Text = "Saving " & OutputPath
                     ExcelApp.ActiveWorkbook.SaveAs(OutputPath)
@@ -175,9 +184,11 @@ Public Class Form1
             End If
 
         Catch ex As Exception
+            ' Handle any errors that occur
             MessageBox.Show(ex.Message)
             MessageBox.Show("Stack Trace: " & vbCrLf & ex.StackTrace)
         Finally
+            ' Close workbooks and release COM objects
             ToolStripStatusLabel1.Text = "Closing Workbooks"
             InputWorkbook.Close(False)
             If Not IsNothing(EKWorkbook) Then EKWorkbook.Close(False)
@@ -197,6 +208,7 @@ Public Class Form1
         TextBoxInputEK.Text = OpenFileDialog1.FileName
     End Sub
 
+    ' Cleans the worksheet name to remove illegal characters
     Private Function CleanSheetName(OriginalName As String) As String
         CleanSheetName = Replace(OriginalName, "/", "-", , , CompareMethod.Text)
         CleanSheetName = Replace(CleanSheetName, "\", "-", , , CompareMethod.Text)
@@ -230,6 +242,7 @@ Public Class Form1
         End If
     End Sub
 
+    ' Removes illegal characters from file names
     Private Function RemoveIllegalFileNameChars(input As String, Optional replacement As String = "") As String
         Dim regexSearch = New String(Path.GetInvalidFileNameChars()) & New String(Path.GetInvalidPathChars())
         Dim r = New Regex(String.Format("[{0}]", Regex.Escape(regexSearch)))
