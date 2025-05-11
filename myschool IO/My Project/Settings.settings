@@ -1,7 +1,33 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" UseMySettingsClassName="true">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="My" GeneratedClassName="MySettings" UseMySettingsClassName="true">
+  <Profiles />
+  <Settings>
+    <Setting Name="SettingCourseRange" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D16</Value>
+    </Setting>
+    <Setting Name="SettingIDRange" Type="System.String" Scope="User">
+      <Value Profile="(Default)">B</Value>
+    </Setting>
+    <Setting Name="SettingGradeRange" Type="System.String" Scope="User">
+      <Value Profile="(Default)">N21</Value>
+    </Setting>
+    <Setting Name="SettingTmimaRange" Type="System.String" Scope="User">
+      <Value Profile="(Default)">F14</Value>
+    </Setting>
+    <Setting Name="SettingClassRange" Type="System.String" Scope="User">
+      <Value Profile="(Default)">F15</Value>
+    </Setting>
+    <Setting Name="SettingTeachersRange" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D17</Value>
+    </Setting>
+    <Setting Name="SettingEKTeachersCol" Type="System.String" Scope="User">
+      <Value Profile="(Default)">A</Value>
+    </Setting>
+    <Setting Name="SettingEKTmimaCol" Type="System.String" Scope="User">
+      <Value Profile="(Default)">B</Value>
+    </Setting>
+    <Setting Name="SettingEKCourseCol" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

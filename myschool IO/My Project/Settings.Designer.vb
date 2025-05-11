@@ -53,6 +53,114 @@ Namespace My
                 Return defaultInstance
             End Get
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("D16")>  _
+        Public Property SettingCourseRange() As String
+            Get
+                Return CType(Me("SettingCourseRange"),String)
+            End Get
+            Set
+                Me("SettingCourseRange") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("B")>  _
+        Public Property SettingIDRange() As String
+            Get
+                Return CType(Me("SettingIDRange"),String)
+            End Get
+            Set
+                Me("SettingIDRange") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("N21")>  _
+        Public Property SettingGradeRange() As String
+            Get
+                Return CType(Me("SettingGradeRange"),String)
+            End Get
+            Set
+                Me("SettingGradeRange") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("F14")>  _
+        Public Property SettingTmimaRange() As String
+            Get
+                Return CType(Me("SettingTmimaRange"),String)
+            End Get
+            Set
+                Me("SettingTmimaRange") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("F15")>  _
+        Public Property SettingClassRange() As String
+            Get
+                Return CType(Me("SettingClassRange"),String)
+            End Get
+            Set
+                Me("SettingClassRange") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("D17")>  _
+        Public Property SettingTeachersRange() As String
+            Get
+                Return CType(Me("SettingTeachersRange"),String)
+            End Get
+            Set
+                Me("SettingTeachersRange") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("A")>  _
+        Public Property SettingEKTeachersCol() As String
+            Get
+                Return CType(Me("SettingEKTeachersCol"),String)
+            End Get
+            Set
+                Me("SettingEKTeachersCol") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("B")>  _
+        Public Property SettingEKTmimaCol() As String
+            Get
+                Return CType(Me("SettingEKTmimaCol"),String)
+            End Get
+            Set
+                Me("SettingEKTmimaCol") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("C")>  _
+        Public Property SettingEKCourseCol() As String
+            Get
+                Return CType(Me("SettingEKCourseCol"),String)
+            End Get
+            Set
+                Me("SettingEKCourseCol") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

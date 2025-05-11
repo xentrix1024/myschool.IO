@@ -1,75 +1,8 @@
 ﻿Imports System.Runtime.InteropServices
 Imports System.Text.RegularExpressions
+Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 
 Public Class Form1
-
-    Private Sub ButtonGoOutput_Click(sender As Object, e As EventArgs) Handles ButtonGoOutput.Click
-        Dim ExcelApp As New Excel.Application
-        ' ExcelApp.Visible = True ' Uncomment to make Excel visible
-        ToolStripStatusLabel1.Text = "Creating file " & TextBoxOutputFile.Text
-        Dim OutputWorkbook As Excel.Workbook = ExcelApp.Workbooks.Add
-        Dim OutputSheet As Excel.Worksheet = OutputWorkbook.ActiveSheet
-
-        Try
-            ' Iterate over each file in the ListViewFilesOutput
-            For Each ListItem As ListViewItem In ListViewFilesOutput.Items
-                Dim InputWorkbook As Excel.Workbook = ExcelApp.Workbooks.Open(ListItem.Text)
-                ToolStripStatusLabel1.Text = "Reading file " & InputWorkbook.Name
-                
-                ' Iterate over each worksheet in the input workbook
-                For Each InputSheet As Excel.Worksheet In InputWorkbook.Worksheets
-                    Dim IDCol As Integer = InputSheet.Range(TextBoxIDRange.Text & ":" & TextBoxIDRange.Text).Column
-                    Dim GradeCol As Integer = InputSheet.Range(TextBoxGradeRange.Text).Column
-                    Dim GradeRow As Integer = InputSheet.Range(TextBoxGradeRange.Text).Row
-                    Dim CourseCol As Integer
-                    Dim CourseName As String = InputSheet.Range(TextBoxCourseRange.Text).Value
-
-                    ' Find or create Course column header
-                    Dim CourseNameCell As Excel.Range = Nothing
-                    CourseNameCell = OutputSheet.Range(OutputSheet.Cells(1, 2), OutputSheet.Cells(1, OutputSheet.UsedRange.Columns.Count)).Find(CourseName, , , Excel.XlLookAt.xlWhole)
-                    If IsNothing(CourseNameCell) Then
-                        CourseCol = OutputSheet.UsedRange.Columns.Count + 1
-                        OutputSheet.Cells(1, CourseCol).Value = CourseName
-                    Else
-                        CourseCol = CourseNameCell.Column
-                    End If
-
-                    ' Copy Grades to Course column, ID row
-                    While Not IsNothing(InputSheet.Cells(GradeRow, IDCol).Value)
-                        Dim ID As Integer = InputSheet.Cells(GradeRow, IDCol).Value
-                        OutputSheet.Cells(ID, 1).Value = ID
-                        OutputSheet.Cells(ID, CourseCol).Value = InputSheet.Cells(GradeRow, GradeCol).Value
-                        GradeRow += 1
-                    End While
-                Next
-                InputWorkbook.Close()
-                Marshal.ReleaseComObject(InputWorkbook)
-            Next
-
-            ' Save and close the output workbook
-            ToolStripStatusLabel1.Text = "Saving Workbook"
-            OutputWorkbook.SaveAs(TextBoxOutputFile.Text, Excel.XlFileFormat.xlAddIn8)
-            ToolStripStatusLabel1.Text = "Closing Workbook"
-            OutputWorkbook.Close(False)
-            ToolStripStatusLabel1.Text = "Closing Excel"
-            ExcelApp.Quit()
-            ToolStripStatusLabel1.Text = "Done"
-        Catch ex As Exception
-            ' Handle any errors that occur
-            ToolStripStatusLabel1.Text = "Error: " & ex.Message
-            MessageBox.Show(ex.Message)
-            MessageBox.Show("Stack Trace: " & vbCrLf & ex.StackTrace)
-        Finally
-            ' Release COM objects and perform garbage collection
-            Marshal.ReleaseComObject(OutputSheet)
-            Marshal.ReleaseComObject(OutputWorkbook)
-            Marshal.ReleaseComObject(ExcelApp)
-            OutputSheet = Nothing
-            OutputWorkbook = Nothing
-            ExcelApp = Nothing
-            GC.Collect()
-        End Try
-    End Sub
 
     Private Sub ButtonGoInput_Click(sender As Object, e As EventArgs) Handles ButtonGoInput.Click
         Dim ExcelApp As Excel.Application
@@ -96,12 +29,20 @@ Public Class Form1
                     If IsNothing(EKWorkbook) Then Continue For
                     Dim EKSheet As Excel.Worksheet
                     EKSheet = EKWorkbook.Worksheets(1)
-                    With EKSheet.Range(TextBoxEKTmimaCol.Text & ":" & TextBoxEKTmimaCol.Text)
-                        Dim TmimaEK As Excel.Range = .Find(InputSheet.Range(TextBoxTmimaRange.Text).Value)
-                        While EKSheet.Range(TextBoxEKCourseCol.Text & TmimaEK.Row).Value <> InputSheet.Range(TextBoxCourseRange.Text).Value
-                            TmimaEK = .FindNext(TmimaEK.Cells(1, 1))
-                        End While
-                        newTeacher = EKSheet.Range(TextBoxEKTeachersCol.Text & TmimaEK.Row).Value
+                    With EKSheet.Range(TextBoxEKCourseCol.Text & ":" & TextBoxEKCourseCol.Text)
+                        Dim EKCourse As Excel.Range = .Find(InputSheet.Range(TextBoxCourseRange.Text).Value)
+                        Dim FirstAddress As String = EKCourse.Address
+                        Do
+                            If EKSheet.Range(TextBoxEKTmimaCol.Text & EKCourse.Row).Value = InputSheet.Range(TextBoxTmimaRange.Text).Value Then
+                                Dim teacherName As String = EKSheet.Range(TextBoxEKTeachersCol.Text & EKCourse.Row).Value
+                                If Len(newTeacher) > 0 Then
+                                    newTeacher = newTeacher & ", " & teacherName
+                                Else
+                                    newTeacher = teacherName
+                                End If
+                            End If
+                            EKCourse = .FindNext(EKCourse)
+                        Loop While Not IsNothing(EKCourse) And EKCourse.Address <> FirstAddress
                         InputSheet.Range(TextBoxTeachersRange.Text).Value = newTeacher
                         InputSheet.Range(TextBoxTeachersRange.Text).RowHeight = InputSheet.Range(TextBoxTeachersRange.Text).RowHeight * 2
                     End With
@@ -198,15 +139,80 @@ Public Class Form1
         End Try
     End Sub
 
-    Private Sub ButtonBrowseInputFile_Click(sender As Object, e As EventArgs) Handles ButtonBrowseInputFile.Click
-        OpenFileDialog1.ShowDialog()
-        TextBoxInputFile.Text = OpenFileDialog1.FileName
+    Private Sub ButtonGoOutput_Click(sender As Object, e As EventArgs) Handles ButtonGoOutput.Click
+        Dim ExcelApp As New Excel.Application
+        ' ExcelApp.Visible = True ' Uncomment to make Excel visible
+        ToolStripStatusLabel1.Text = "Creating file " & TextBoxOutputFile.Text
+        Dim OutputWorkbook As Excel.Workbook = ExcelApp.Workbooks.Add
+        Dim OutputSheet As Excel.Worksheet = OutputWorkbook.ActiveSheet
+
+        Try
+            ' Iterate over each file in the ListViewFilesOutput
+            For Each ListItem As ListViewItem In ListViewFilesOutput.Items
+                Dim InputWorkbook As Excel.Workbook = ExcelApp.Workbooks.Open(ListItem.Tag.ToString())
+                ToolStripStatusLabel1.Text = "Reading file " & InputWorkbook.Name
+
+                ' Iterate over each worksheet in the input workbook
+                For Each InputSheet As Excel.Worksheet In InputWorkbook.Worksheets
+                    Dim IDCol As Integer = InputSheet.Range(TextBoxIDRange.Text & ":" & TextBoxIDRange.Text).Column
+                    Dim GradeCol As Integer = InputSheet.Range(TextBoxGradeRange.Text).Column
+                    Dim GradeRow As Integer = InputSheet.Range(TextBoxGradeRange.Text).Row
+                    Dim CourseCol As Integer
+                    Dim CourseName As String = InputSheet.Range(TextBoxCourseRange.Text).Value
+
+                    ' Find or create Course column header
+                    Dim CourseNameCell As Excel.Range = Nothing
+                    CourseNameCell = OutputSheet.Range(OutputSheet.Cells(1, 2), OutputSheet.Cells(1, OutputSheet.UsedRange.Columns.Count)).Find(CourseName, , , Excel.XlLookAt.xlWhole)
+                    If IsNothing(CourseNameCell) Then
+                        CourseCol = OutputSheet.UsedRange.Columns.Count + 1
+                        OutputSheet.Cells(1, CourseCol).Value = CourseName
+                    Else
+                        CourseCol = CourseNameCell.Column
+                    End If
+
+                    ' Copy Grades to Course column, ID row
+                    While Not IsNothing(InputSheet.Cells(GradeRow, IDCol).Value)
+                        Dim ID As Integer = InputSheet.Cells(GradeRow, IDCol).Value
+                        OutputSheet.Cells(ID, 1).Value = ID
+                        OutputSheet.Cells(ID, CourseCol).Value = InputSheet.Cells(GradeRow, GradeCol).Value
+                        GradeRow += 1
+                    End While
+                Next
+                InputWorkbook.Close()
+                Marshal.ReleaseComObject(InputWorkbook)
+            Next
+
+            ' Save and close the output workbook
+            ToolStripStatusLabel1.Text = "Saving Workbook"
+            OutputWorkbook.SaveAs(TextBoxOutputFile.Text, Excel.XlFileFormat.xlAddIn8)
+            ToolStripStatusLabel1.Text = "Closing Workbook"
+            OutputWorkbook.Close(False)
+            ToolStripStatusLabel1.Text = "Closing Excel"
+            ExcelApp.Quit()
+            ToolStripStatusLabel1.Text = "Done"
+        Catch ex As Exception
+            ' Handle any errors that occur
+            ToolStripStatusLabel1.Text = "Error: " & ex.Message
+            MessageBox.Show(ex.Message)
+            MessageBox.Show("Stack Trace: " & vbCrLf & ex.StackTrace)
+        Finally
+            ' Release COM objects and perform garbage collection
+            Marshal.ReleaseComObject(OutputSheet)
+            Marshal.ReleaseComObject(OutputWorkbook)
+            Marshal.ReleaseComObject(ExcelApp)
+            OutputSheet = Nothing
+            OutputWorkbook = Nothing
+            ExcelApp = Nothing
+            GC.Collect()
+        End Try
     End Sub
 
-    Private Sub ButtonBrowseEK_Click(sender As Object, e As EventArgs) Handles ButtonBrowseEK.Click
-        OpenFileDialog1.ShowDialog()
-        TextBoxInputEK.Text = OpenFileDialog1.FileName
-    End Sub
+    ' Removes illegal characters from file names
+    Private Function RemoveIllegalFileNameChars(input As String, Optional replacement As String = "") As String
+        Dim regexSearch = New String(Path.GetInvalidFileNameChars()) & New String(Path.GetInvalidPathChars())
+        Dim r = New Regex(String.Format("[{0}]", Regex.Escape(regexSearch)))
+        Return r.Replace(input, replacement)
+    End Function
 
     ' Cleans the worksheet name to remove illegal characters
     Private Function CleanSheetName(OriginalName As String) As String
@@ -222,16 +228,28 @@ Public Class Form1
         End If
     End Function
 
+    Private Sub ButtonBrowseInputFile_Click(sender As Object, e As EventArgs) Handles ButtonBrowseInputFile.Click
+        OpenFileDialog1.ShowDialog()
+        TextBoxInputFile.Text = OpenFileDialog1.FileName
+    End Sub
+
+    Private Sub ButtonBrowseEK_Click(sender As Object, e As EventArgs) Handles ButtonBrowseEK.Click
+        OpenFileDialog1.ShowDialog()
+        TextBoxInputEK.Text = OpenFileDialog1.FileName
+    End Sub
+
     Private Sub ButtonBrowseOutputFile_Click(sender As Object, e As EventArgs) Handles ButtonBrowseOutputFile.Click
         SaveFileDialog1.ShowDialog()
         TextBoxOutputFile.Text = SaveFileDialog1.FileName
     End Sub
 
     Private Sub ListViewFilesOutput_DragDrop(sender As Object, e As DragEventArgs) Handles ListViewFilesOutput.DragDrop
-        If (e.Data.GetDataPresent(DataFormats.FileDrop)) Then
-            Dim strFiles() As String = e.Data.GetData(DataFormats.FileDrop)
-            For i = 0 To strFiles.Length - 1
-                ListViewFilesOutput.Items.Add(strFiles(i), 0)
+        If e.Data.GetDataPresent(DataFormats.FileDrop) Then
+            Dim strFiles() As String = CType(e.Data.GetData(DataFormats.FileDrop), String())
+            For Each filePath As String In strFiles
+                With ListViewFilesOutput.Items.Add(New ListViewItem(System.IO.Path.GetFileName(filePath)))
+                    .Tag = filePath
+                End With
             Next
         End If
     End Sub
@@ -242,10 +260,32 @@ Public Class Form1
         End If
     End Sub
 
-    ' Removes illegal characters from file names
-    Private Function RemoveIllegalFileNameChars(input As String, Optional replacement As String = "") As String
-        Dim regexSearch = New String(Path.GetInvalidFileNameChars()) & New String(Path.GetInvalidPathChars())
-        Dim r = New Regex(String.Format("[{0}]", Regex.Escape(regexSearch)))
-        Return r.Replace(input, replacement)
-    End Function
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        ListViewFilesOutput.Items.Clear()
+    End Sub
+
+    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        TextBoxCourseRange.Text = My.Settings.SettingCourseRange
+        TextBoxIDRange.Text = My.Settings.SettingIDRange
+        TextBoxGradeRange.Text = My.Settings.SettingGradeRange
+        TextBoxTmimaRange.Text = My.Settings.SettingTmimaRange
+        TextBoxClassRange.Text = My.Settings.SettingClassRange
+        TextBoxTeachersRange.Text = My.Settings.SettingTeachersRange
+        TextBoxEKTeachersCol.Text = My.Settings.SettingEKTeachersCol
+        TextBoxEKTmimaCol.Text = My.Settings.SettingEKTmimaCol
+        TextBoxEKCourseCol.Text = My.Settings.SettingEKCourseCol
+    End Sub
+
+    Private Sub Form1_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        My.Settings.SettingCourseRange = TextBoxCourseRange.Text
+        My.Settings.SettingIDRange = TextBoxIDRange.Text
+        My.Settings.SettingGradeRange = TextBoxGradeRange.Text
+        My.Settings.SettingTmimaRange = TextBoxTmimaRange.Text
+        My.Settings.SettingClassRange = TextBoxClassRange.Text
+        My.Settings.SettingTeachersRange = TextBoxTeachersRange.Text
+        My.Settings.SettingEKTeachersCol = TextBoxEKTeachersCol.Text
+        My.Settings.SettingEKTmimaCol = TextBoxEKTmimaCol.Text
+        My.Settings.SettingEKCourseCol = TextBoxEKCourseCol.Text
+        My.Settings.Save()
+    End Sub
 End Class

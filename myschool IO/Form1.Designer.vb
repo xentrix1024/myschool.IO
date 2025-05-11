@@ -62,6 +62,8 @@ Partial Class Form1
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
         Me.TextBoxIDRange = New System.Windows.Forms.TextBox()
         Me.TextBoxGradeRange = New System.Windows.Forms.TextBox()
+        Me.ColumnHeader1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me.Button1 = New System.Windows.Forms.Button()
         Me.StatusStrip1.SuspendLayout()
         Me.GroupBoxInput.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
@@ -191,7 +193,7 @@ Partial Class Form1
         'StatusStrip1
         '
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel1, Me.ToolStripStatusLabel2})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 401)
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 400)
         Me.StatusStrip1.Name = "StatusStrip1"
         Me.StatusStrip1.Size = New System.Drawing.Size(574, 22)
         Me.StatusStrip1.TabIndex = 8
@@ -375,6 +377,7 @@ Partial Class Form1
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.GroupBoxOutput.BackColor = System.Drawing.SystemColors.ControlLightLight
+        Me.GroupBoxOutput.Controls.Add(Me.Button1)
         Me.GroupBoxOutput.Controls.Add(Me.ListViewFilesOutput)
         Me.GroupBoxOutput.Controls.Add(Me.ButtonGoOutput)
         Me.GroupBoxOutput.Controls.Add(Me.TextBoxOutputFile)
@@ -392,13 +395,16 @@ Partial Class Form1
         Me.ListViewFilesOutput.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ListViewFilesOutput.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1})
         Me.ListViewFilesOutput.FullRowSelect = True
-        Me.ListViewFilesOutput.Location = New System.Drawing.Point(7, 20)
+        Me.ListViewFilesOutput.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None
+        Me.ListViewFilesOutput.HideSelection = False
+        Me.ListViewFilesOutput.Location = New System.Drawing.Point(6, 45)
         Me.ListViewFilesOutput.Name = "ListViewFilesOutput"
         Me.ListViewFilesOutput.Size = New System.Drawing.Size(259, 277)
         Me.ListViewFilesOutput.TabIndex = 2
         Me.ListViewFilesOutput.UseCompatibleStateImageBehavior = False
-        Me.ListViewFilesOutput.View = System.Windows.Forms.View.List
+        Me.ListViewFilesOutput.View = System.Windows.Forms.View.Details
         '
         'ButtonGoOutput
         '
@@ -414,7 +420,7 @@ Partial Class Form1
         '
         Me.TextBoxOutputFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.TextBoxOutputFile.Location = New System.Drawing.Point(6, 306)
+        Me.TextBoxOutputFile.Location = New System.Drawing.Point(6, 19)
         Me.TextBoxOutputFile.Name = "TextBoxOutputFile"
         Me.TextBoxOutputFile.ReadOnly = True
         Me.TextBoxOutputFile.Size = New System.Drawing.Size(179, 20)
@@ -424,7 +430,7 @@ Partial Class Form1
         'ButtonBrowseOutputFile
         '
         Me.ButtonBrowseOutputFile.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ButtonBrowseOutputFile.Location = New System.Drawing.Point(191, 303)
+        Me.ButtonBrowseOutputFile.Location = New System.Drawing.Point(191, 17)
         Me.ButtonBrowseOutputFile.Name = "ButtonBrowseOutputFile"
         Me.ButtonBrowseOutputFile.Size = New System.Drawing.Size(75, 23)
         Me.ButtonBrowseOutputFile.TabIndex = 0
@@ -451,11 +457,24 @@ Partial Class Form1
         Me.TextBoxGradeRange.TabIndex = 2
         Me.TextBoxGradeRange.Text = "N21"
         '
+        'ColumnHeader1
+        '
+        Me.ColumnHeader1.Width = 400
+        '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(6, 332)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(75, 22)
+        Me.Button1.TabIndex = 4
+        Me.Button1.Text = "Καθαρισμός"
+        Me.Button1.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(574, 423)
+        Me.ClientSize = New System.Drawing.Size(574, 422)
         Me.Controls.Add(Me.TextBoxGradeRange)
         Me.Controls.Add(Me.GroupBoxOutput)
         Me.Controls.Add(Me.TextBoxIDRange)
@@ -521,5 +540,6 @@ Partial Class Form1
     Friend WithEvents CheckBoxCreateFolders As System.Windows.Forms.CheckBox
     Friend WithEvents TextBoxIDRange As System.Windows.Forms.TextBox
     Friend WithEvents TextBoxGradeRange As System.Windows.Forms.TextBox
-
+    Friend WithEvents ColumnHeader1 As ColumnHeader
+    Friend WithEvents Button1 As System.Windows.Forms.Button
 End Class

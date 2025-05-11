@@ -1,9 +1,3 @@
-D:\Dev\myschool IO\myschool IO\bin\Debug\myschool IO.exe.config
-D:\Dev\myschool IO\myschool IO\bin\Debug\myschool IO.exe.manifest
-D:\Dev\myschool IO\myschool IO\bin\Debug\myschool IO.application
-D:\Dev\myschool IO\myschool IO\bin\Debug\myschool IO.exe
-D:\Dev\myschool IO\myschool IO\bin\Debug\myschool IO.pdb
-D:\Dev\myschool IO\myschool IO\bin\Debug\myschool IO.xml
 D:\Dev\myschool IO\myschool IO\obj\Debug\myschool IO.vbproj.AssemblyReference.cache
 D:\Dev\myschool IO\myschool IO\obj\Debug\Interop.Microsoft.Office.Core.dll
 D:\Dev\myschool IO\myschool IO\obj\Debug\Interop.Microsoft.Office.Interop.Excel.dll
@@ -13,6 +7,12 @@ D:\Dev\myschool IO\myschool IO\obj\Debug\myschoolIO.Form1.resources
 D:\Dev\myschool IO\myschool IO\obj\Debug\myschoolIO.Resources.resources
 D:\Dev\myschool IO\myschool IO\obj\Debug\myschool IO.vbproj.GenerateResource.cache
 D:\Dev\myschool IO\myschool IO\obj\Debug\myschool IO.vbproj.CoreCompileInputs.cache
+D:\Dev\myschool IO\myschool IO\bin\Debug\myschool IO.exe.config
+D:\Dev\myschool IO\myschool IO\bin\Debug\myschool IO.exe.manifest
+D:\Dev\myschool IO\myschool IO\bin\Debug\myschool IO.application
+D:\Dev\myschool IO\myschool IO\bin\Debug\myschool IO.exe
+D:\Dev\myschool IO\myschool IO\bin\Debug\myschool IO.pdb
+D:\Dev\myschool IO\myschool IO\bin\Debug\myschool IO.xml
 D:\Dev\myschool IO\myschool IO\obj\Debug\myschool IO.exe.manifest
 D:\Dev\myschool IO\myschool IO\obj\Debug\myschool IO.application
 D:\Dev\myschool IO\myschool IO\obj\Debug\myschool IO.exe
